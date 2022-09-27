@@ -1,0 +1,24 @@
+* consult-fasd
+[[https://github.com/clvv/fasd][Fasd]] integration for =consult=. Basically [[https://github.com/ajsalminen/helm-fasd][helm-fasd]] alternative for helm-less configuration with some improvement.
+
+The query can be filter first by fasd then a second time by consult the same ways as consult-grep
+
+For example: =#Dow#cons= may find the =consult.el= file in =Downloads= directory.
+* Install
+It's generally advised to also install =fasd= package from =melpa= to keep =fasd= cache up to date with Emacs, but it's not required.
+
+The package provide an interactive function =consult-fasd= that should be binded to a key (or can be used directly with =M-x=)
+
+#+begin_src emacs-lisp
+  (use-package consult-fasd :ensure fasd :defer t
+    :quelpa (consult-fasd :fetcher github :repo "linktohack/consult-fasd")
+    :init
+    (global-fasd-mode 1)
+    (define-key global-map (kbd "s-T") #'consult-fasd))
+#+end_src
+* Customisation
+#+begin_src emacs-lisp
+  (defcustom consult-fasd-args "fasd -Rl" ...)
+#+end_src
+* LICENSE
+GPL3
