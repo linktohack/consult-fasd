@@ -1,10 +1,10 @@
-;;; consult-fasd.el --- Fasd integration for consult
+;;; consult-fasd.el --- Fasd integration for consult  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022 Quang-Linh LE
 
 ;; Author: Quang-Linh LE <linktohack@gmail.com>
 ;; Keywords: fasd consult helm
-;; Version: 0.0.1
+;; Version: 0.0.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -38,12 +38,16 @@
 The dynamically computed arguments are appended."
   :type 'string)
 
-(defun consult--fasd-builder (input)
+(defun consult--fasd-builder ()
   "Build command line given CONFIG and INPUT."
-  (pcase-let ((`(,arg . ,opts) (consult--command-split input)))
-    (list :command (append (split-string-and-unquote consult-fasd-args)
-			   (list arg) opts)
-	  :highlight (cdr (consult--default-regexp-compiler input 'basic t)))))
+  (let* ((cmd (consult--build-args consult-fasd-args))
+         (type 'basic))
+    (lambda (input)
+      (pcase-let* ((`(,arg . ,opts) (consult--command-split input))
+                     (`(,re . ,hl) (funcall consult--regexp-compiler arg type t)))
+          (when re
+            (cons (append cmd re opts)
+                  hl))))))
 
 ;;;###autoload 
 (defun consult-fasd (&optional initial)
@@ -55,7 +59,7 @@ linear search through the entire database. The fasd process is started
 asynchronously, similar to `consult-grep'. See `consult-grep' for more
 details regarding the asynchronous search."
   (interactive)
-  (find-file (consult--find "Fasd: " #'consult--fasd-builder initial)))
+  (find-file (consult--find "Fasd: " (consult--fasd-builder) initial)))
 
 (provide 'consult-fasd)
 ;;; consult-fasd.el ends here
